@@ -12,10 +12,10 @@ class Reader(object):
         f.close()
         self.prepareData()
         self.eliminateLeftRecusion()
-        # print(self.file_lines)
+        print(self.file_lines)
         # print(self.terminals)
-        # print(self.non_terminals)
-        # print(self.productions)
+        print(self.non_terminals)
+        print(self.productions)
         # for k in self.non_terminals:
         #     print(k+" => "+self.productions[k])
 
@@ -50,10 +50,21 @@ class Reader(object):
                     s = self.productions[self.non_terminals[i]].find(self.non_terminals[j], s)
                     if s == -1:
                         break
-                    if s != 0 and (self.productions[self.non_terminals[i]][s-1] != ' ' or self.productions[self.non_terminals[i]][s+len(self.non_terminals[j])] != ' '):
-                        s += 1
-                    else:
-                        self.replaceString(self.non_terminals[i], self.non_terminals[j], s)
+                    if s+len(self.non_terminals[j]) < len(self.productions[self.non_terminals[i]]):
+                        if s == 0:
+                            if self.productions[self.non_terminals[i]][s+len(self.non_terminals[j])] == ' ':
+                                self.replaceString(self.non_terminals[i], self.non_terminals[j], s)
+                            else:
+                                s += 1
+                        else:
+                            if self.productions[self.non_terminals[i]][s-1] == ' ' and self.productions[self.non_terminals[i]][s+len(self.non_terminals[j])] == ' ':
+                                self.replaceString(self.non_terminals[i], self.non_terminals[j], s)
+                            else:
+                                s += 1
+                    # if s != 0 and (self.productions[self.non_terminals[i]][s-1] != ' ' or self.productions[self.non_terminals[i]][s+len(self.non_terminals[j])] != ' '):
+                    #     s += 1
+                    # else:
+                    #     self.replaceString(self.non_terminals[i], self.non_terminals[j], s)
             self.eliminateImmediateLeftRecusion(self.non_terminals[i])
 
 
