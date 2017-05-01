@@ -1,6 +1,7 @@
 
 firsts = dict()
 
+from CFGReader import Reader
 
 def construct_first(production_rules):
     '''get the LHS and if first one is a terminal add to the first of the current
@@ -41,7 +42,7 @@ def construct_follows(production_rules):
 
     VARIABLES = [ rule['LHS'] for rule in production_rules]
     ALL_RHS_RULES = [rule['RHS'] for rule in production_rules]
-    ELIPSON = vars()
+    ELIPSON = "None"
     for v in VARIABLES:
         '''loop on all variables checking RHS rules for getting follows'''
         if follows.get(v) is None:
@@ -61,7 +62,7 @@ def construct_follows(production_rules):
                         follows[v].append(testing_next[1])
                     else:
                         '''found another variable'''
-                        #FIXME: add ELIPSON object
+
                         for vv in testing_string.split():
                             vv = vv.strip()
                             if ELIPSON in firsts.get(vv):
@@ -70,3 +71,13 @@ def construct_follows(production_rules):
                                 break
 
             #TODO: if ELIPSONe add to as an object
+
+reader = Reader()
+production_rules = list()
+
+def translate():
+    for non_terminal in reader.non_terminals:
+        temp_dict = dict()
+        temp_dict['LHS'] = non_terminal
+        temp_dict['RHS'] = reader.productions.get(non_terminal).split('|')
+        production_rules.append(temp_dict)
