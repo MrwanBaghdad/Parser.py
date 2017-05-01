@@ -16,11 +16,9 @@
 # FACTOR = 'id' | 'num' | '(' EXPRESSION ')'
 # SIGN = '+' | '-'
 
-#A = C
-#B = A 'id' 'if' | C
-#C = B 'id' | B
-
 #E = E '+' T | T
 #T = T '*' F | F
 #F = 'id' | '(' E ')'
 
+#S = A 'a' | 'b'
+#A = A 'c' | S 'd' | 'f'

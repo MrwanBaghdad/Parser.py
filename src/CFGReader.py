@@ -3,7 +3,7 @@ import re
 
 class Reader(object):
     def __init__(self, file_name='cfg'):
-        # self.terminals = []
+        self.terminals = []
         self.non_terminals = []
         self.file_lines = []
         self.productions = {}
@@ -36,10 +36,9 @@ class Reader(object):
             temp = line.split('=')
             self.productions[temp[0].strip()] = temp[1].strip()
             self.non_terminals.append(temp[0].strip())
-            # list = re.findall(r'‘\w+’|‘[\W\w\S]*’', temp[1])
-            # for value in list:
-            #     if value[0] == '‘':
-            #         self.terminals.append(value)
+            temp = re.findall(r'(\'[\w+*\-(),;{}=_]*\')', temp[1])
+            for tempya in temp:
+                self.terminals.append(tempya)
 
     def eliminateLeftRecusion(self):
         length = len(self.non_terminals)
