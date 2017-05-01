@@ -2,7 +2,7 @@ import re
 
 
 class Reader(object):
-    def __init__(self, file_name='cfg.txt'):
+    def __init__(self, file_name='cfg'):
         self.terminals = []
         self.non_terminals = []
         self.file_lines = []
@@ -12,6 +12,12 @@ class Reader(object):
         f.close()
         self.prepareData()
         self.eliminateLeftRecusion()
+        # print(self.file_lines)
+        # print(self.terminals)
+        print(self.non_terminals)
+        print(self.productions)
+        for k in self.non_terminals:
+            print(k+" => "+self.productions[k])
 
 
     def prepareData(self):
@@ -30,14 +36,10 @@ class Reader(object):
             temp = line.split('=')
             self.productions[temp[0].strip()] = temp[1].strip()
             self.non_terminals.append(temp[0].strip())
-            list = re.findall(r'‘\w+’|‘[\W\w]*’', temp[1])
-            for value in list:
-                self.terminals.append(value)
-        print(self.file_lines)
-        print(self.terminals)
-        print(self.non_terminals)
-        print(self.productions)
-        return None
+            # list = re.findall(r'‘\w+’|‘[\W\w\S]*’', temp[1])
+            # for value in list:
+            #     if value[0] == '‘':
+            #         self.terminals.append(value)
 
     def eliminateLeftRecusion(self):
         length = len(self.non_terminals)
@@ -53,8 +55,7 @@ class Reader(object):
                     else:
                         self.replaceString(self.non_terminals[i], self.non_terminals[j], s)
             self.eliminateImmediateLeftRecusion(self.non_terminals[i])
-        for k in self.non_terminals:
-            print(k+" => "+self.productions[k])
+
 
     def replaceString(self, key, value, s):
         trace = s + len(value)
@@ -87,7 +88,7 @@ class Reader(object):
             new_non_terminal = key + "`"
             string = ""
             for non in non_recursive:
-                string += non.strip()+" "+new_non_terminal+" | "
+                string += non.strip() + " " + new_non_terminal + " | "
             string = string[:len(string)-3]
             self.productions[key] = string
             new_non_terminal_value = ""
