@@ -13,3 +13,5 @@ class Table(object):
                     self.table[(non_terminal, terminal)] = None
 
     def trace(self):
+        # TODO Implement the trace function
+        return None
