@@ -3,7 +3,7 @@ import re
 
 class Reader(object):
     def __init__(self, file_name='cfg'):
-        self.terminals = []
+        # self.terminals = []
         self.non_terminals = []
         self.file_lines = []
         self.productions = {}
@@ -14,10 +14,10 @@ class Reader(object):
         self.eliminateLeftRecusion()
         # print(self.file_lines)
         # print(self.terminals)
-        print(self.non_terminals)
-        print(self.productions)
-        for k in self.non_terminals:
-            print(k+" => "+self.productions[k])
+        # print(self.non_terminals)
+        # print(self.productions)
+        # for k in self.non_terminals:
+        #     print(k+" => "+self.productions[k])
 
 
     def prepareData(self):
