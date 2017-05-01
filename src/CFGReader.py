@@ -12,15 +12,15 @@ class Reader(object):
         f.close()
         self.prepareData()
         self.eliminateLeftRecusion()
-        print(self.file_lines)
+        # print(self.file_lines)
         # print(self.terminals)
-        print(self.non_terminals)
-        print(self.productions)
+        # print(self.non_terminals)
+        # print(self.productions)
         # for k in self.non_terminals:
         #     print(k+" => "+self.productions[k])
 
-
     def prepareData(self):
+        # Read Productions From the given file and analyze data into terminals and non-terminals
         temp = []
         for line in self.data:
             temp.append(re.sub(r'[#\n]', '', line))
@@ -36,11 +36,12 @@ class Reader(object):
             temp = line.split('=')
             self.productions[temp[0].strip()] = temp[1].strip()
             self.non_terminals.append(temp[0].strip())
-            temp = re.findall(r'(\'[\w+*\-(),;{}=_]*\')', temp[1])
-            for tempya in temp:
-                self.terminals.append(tempya)
+            terminals_list = re.findall(r'(\'[\w+*\-(),;{}=_]*\')', temp[1])
+            for terminal in terminals_list:
+                self.terminals.append(terminal)
 
     def eliminateLeftRecusion(self):
+        # Eleminate left recursions from the productions
         length = len(self.non_terminals)
         for i in range(0, length):
             for j in range(0, i):
@@ -60,14 +61,10 @@ class Reader(object):
                                 self.replaceString(self.non_terminals[i], self.non_terminals[j], s)
                             else:
                                 s += 1
-                    # if s != 0 and (self.productions[self.non_terminals[i]][s-1] != ' ' or self.productions[self.non_terminals[i]][s+len(self.non_terminals[j])] != ' '):
-                    #     s += 1
-                    # else:
-                    #     self.replaceString(self.non_terminals[i], self.non_terminals[j], s)
             self.eliminateImmediateLeftRecusion(self.non_terminals[i])
 
-
     def replaceString(self, key, value, s):
+        # Replace a non-terminal with it's corresponding value in the production dictionary
         trace = s + len(value)
         following = ""
         while trace < len(self.productions[key]):
@@ -76,13 +73,14 @@ class Reader(object):
             following += self.productions[key][trace]
             trace += 1
         new_string = ""
-        temp = self.productions[value].split('|')
-        for tempaya in temp:
-            new_string += tempaya.strip() + " " + following.strip() + " | "
+        splitted_productions = self.productions[value].split('|')
+        for production in splitted_productions:
+            new_string += production.strip() + " " + following.strip() + " | "
         new_string = new_string[:len(new_string) - 3]
         self.productions[key] = self.productions[key].replace((value+following).strip(), new_string, 1)
 
     def eliminateImmediateLeftRecusion(self, key):
+        # This function eliminate immediate Left Recursion => A = AB|Aa|A
         productions = self.productions[key].split('|')
         recursive = []
         non_recursive = []
