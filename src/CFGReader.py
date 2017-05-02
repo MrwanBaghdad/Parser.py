@@ -7,11 +7,18 @@ class Reader(object):
         self.non_terminals = []
         self.file_lines = []
         self.productions = {}
+        self.productions2 = {}
         f = open(file_name, 'r')
         self.data = f.readlines()
         f.close()
         self.prepareData()
         self.eliminateLeftRecusion()
+        for non_terminal in self.non_terminals:
+            array = self.productions[non_terminal].split("|")
+            temp = []
+            for element in array:
+                temp.append(element.strip())
+            self.productions2[non_terminal] = temp
         # print(self.file_lines)
         # print(self.terminals)
         # print(self.non_terminals)
@@ -63,9 +70,9 @@ class Reader(object):
                                 s += 1
             self.eliminateImmediateLeftRecusion(self.non_terminals[i])
 
-    def replaceString(self, key, value, s):
+    def replaceString(self, key, value, index):
         # Replace a non-terminal with it's corresponding value in the production dictionary
-        trace = s + len(value)
+        trace = index + len(value)
         following = ""
         while trace < len(self.productions[key]):
             if self.productions[key][trace] == '|':
@@ -105,3 +112,9 @@ class Reader(object):
             new_non_terminal_value += "None"
             self.non_terminals.append(new_non_terminal)
             self.productions[new_non_terminal] = new_non_terminal_value
+
+    def getProduction(self, non_terminal, terminal):
+        for production in self.productions2[non_terminal]:
+            if production.find(terminal) == 0:
+                return production
+        return None
