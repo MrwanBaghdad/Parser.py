@@ -1,10 +1,18 @@
 
 firsts = dict()
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
+from CFGReader import Reader
+
+VARIABLES = []
+ALL_RHS_RULES = []
+ELIPSON  = "None"
 def construct_first(production_rules):
     '''get the LHS and if first one is a terminal add to the first of the current
     Variable (non terminal) if it's a non terminal get the '''
+
     for rule in reversed(production_rules):
         if firsts.get(rule['LHS']) is None:
             firsts[rule['LHS']] = list()
@@ -14,7 +22,24 @@ def construct_first(production_rules):
                 firsts[rule['LHS']].append(or_rules[1])
             else:
                 '''getting a non terminal'''
+                elipson_index = or_rules.find("None")
+                if elipson_index == 0:
+                    firsts[rule['LHS']].append("None")
+                    break
+                if isinstance( firsts[rule['LHS']], list) is False:
+                    raise TypeError
+                temp_variable = or_rules.split()[0].strip()
+                if firsts.get(temp_variable) is None or len(firsts.get(temp_variable)) == 0:
+                    get_firsts(temp_variable)
                 firsts[rule['LHS']].append(firsts[or_rules.split()[0].strip()])
+
+def get_firsts(variable):
+    product = reader.productions.get(variable)
+    for or_rules in product.split("|"):
+        if or_rules[0]== '\'':
+            if firsts.get(variable) is None:
+                firsts[variable] = list()
+            firsts[variable].append(or_rules[1])
 
 follows = dict()
 def construct_follows(production_rules):
@@ -39,34 +64,108 @@ def construct_follows(production_rules):
 #                             '''found a variable follow'''
 #                             follows[rules['RHS']].append(firsts[test_next_string[0].strip()])
 
-    VARIABLES = [ rule['LHS'] for rule in production_rules]
-    ALL_RHS_RULES = [rule['RHS'] for rule in production_rules]
-    ELIPSON = vars()
+
     for v in VARIABLES:
         '''loop on all variables checking RHS rules for getting follows'''
-        if follows.get(v) is None:
-            follows[v] = list()
-        if v == production_rules[0].get("LHS"):
-            if '$' not in follows[v]:
-                follows[v].append('$')
-        for rule in ALL_RHS_RULES:
-            for or_rule in rule:
-                if v in or_rule:
-                    start_index = or_rule.index(v)
-                    end_index = start_index + v.__len__()
-                    testing_string = or_rule[end_index:]
-                    testing_next = testing_string.split().strip()
-                    if testing_next[0] =='\'':
-                        '''found a follow terminal'''
-                        follows[v].append(testing_next[1])
-                    else:
-                        '''found another variable'''
-                        #FIXME: add ELIPSON object
-                        for vv in testing_string.split():
-                            vv = vv.strip()
-                            if ELIPSON in firsts.get(vv):
-                                follows[v].append(firsts.get(vv).remove(ELIPSON))
-                            else:
-                                break
+        get_follows(v)
+        # if follows.get(v) is None:
+        #     follows[v] = list()
+        # if v == production_rules[0].get("LHS"):
+        #     if '$' not in follows[v]:
+        #         follows[v].append('$')
+        # for rule in ALL_RHS_RULES:
+        #     for or_rule in rule:
+        #         if v in or_rule.split():
+        #             start_index = or_rule.index(v)
+        #             end_index = start_index + v.__len__()
+        #             #TODO: match exact index 
+        #             testing_string = or_rule[end_index:]
+        #             if len(testing_string) == 0 :
+        #                 follows[v].append('$')
+        #                 break
+        #             testing_next = testing_string.split()[0].strip()
+        #             if testing_next[0] =='\'':
+        #                 '''found a follow terminal'''
+        #                 follows[v].append(testing_next[1])
+        #             else:
+        #                 '''found another variable'''
+        #                 for vv in testing_string.split():
+        #                     vv = vv.strip()
+        #                     if vv not in VARIABLES:
+        #                         continue
+        #                     if ELIPSON in firsts.get(vv):
+        #                         temp_list = firsts.get(vv).copy()
+        #                         temp_list.remove(ELIPSON)
+        #                         follows[v].extend(temp_list)
+        #                         if testing_string.split().index(vv) == len(testing_string.split()) -1:
+        #                             follows[v].extend(follows.get(rule['LHS']))
+        #                     else:
+        #                         break
 
-            #TODO: if ELIPSONe add to as an object
+
+reader = Reader()
+production_rules = list()
+
+def get_follows(variable):
+    if follows.get(variable) is not None:
+        return follows.get(variable)
+    if follows.get(variable) is  None:
+        follows[variable] = list()
+        if VARIABLES[0] == variable.strip():
+            follows[variable].append("$")
+    
+    for product in production_rules:
+        rules = product['RHS']
+        for rule in rules:
+            if variable not in rule.split():
+                continue
+            start_index = rule.index(variable)
+            end_index = start_index + len(variable)
+            testing_string = rule[end_index:]
+            if testing_string  == '':
+                if variable != product['LHS']:
+                    follows[variable].extend(get_follows(product['LHS']))
+            for v in testing_string.split():
+                v = v.strip()
+                if v[0] == '\'':
+                    follows[variable].append(v[1])
+                    break
+                if ELIPSON in firsts.get(v):
+                    temp_list = firsts.get(v).copy()
+                    temp_list.remove(ELIPSON)
+                    follows[variable].extend(temp_list)
+                    if v == testing_string.split()[-1] and v != product['LHS']:
+                        '''at end of rule'''
+                        follows[variable].extend(get_follows(product['LHS']))
+                else:
+                    break
+
+def translate():
+    for non_terminal in reader.non_terminals:
+        temp_dict = dict()
+        temp_dict['LHS'] = non_terminal
+        temp_dict['RHS'] = [i.strip() for i in reader.productions.get(non_terminal).split('|')]
+        production_rules.append(temp_dict)
+    global VARIABLES 
+    VARIABLES = [ rule['LHS'] for rule in production_rules]
+    global  ALL_RHS_RULES
+    ALL_RHS_RULES = [rule['RHS'] for rule in production_rules]
+    ELIPSON = "None"
+
+from pprint import pprint
+
+translate()
+
+from tabulate import tabulate
+
+print(tabulate(production_rules))
+construct_first(production_rules)
+print("sssssssssssssss")
+pprint(firsts)
+
+construct_follows(production_rules)
+def remove_follows_dub():
+    for variable in VARIABLES:
+        follows[variable] = list(set(follows.get(variable))) 
+remove_follows_dub()
+print(pprint(follows))
