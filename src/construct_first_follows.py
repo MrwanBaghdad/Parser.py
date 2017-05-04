@@ -169,3 +169,21 @@ def remove_follows_dub():
         follows[variable] = list(set(follows.get(variable))) 
 remove_follows_dub()
 print(pprint(follows))
+
+#cleaning firsts
+logging.debug("start cleaning")
+temp_follow  = dict()
+for i in firsts.keys():
+    arr = firsts.get(i)
+    pprint(arr)
+    for j in arr:
+        # logging.debug("Found arr "+str(arr))
+        if isinstance(j, list):
+            #expand and remove
+            if isinstance(arr, list) is False:
+                raise TypeError
+            arr.remove(j)
+            arr.extend(j)
+logging.debug("finished cleaning")
+
+pprint(firsts)
