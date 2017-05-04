@@ -155,9 +155,61 @@ class Reader(object):
             new_name += "`"
         return new_name
 
-    def leftFactoring(self, key):
-        definitions = [production.strip() for production in self.productions[key].split("|")]
-        length = len(definitions[0])
-        for definition in definitions:
-            if len(definition) < length:
-                length = len(definition)
+    def leftFactoring(self):
+        temp_productions = list()
+        sep_productions = dict() #FIXME: assign sep_productions
+        for non_terimnal in self.non_terminals:
+            for prod in sep_productions.get(non_terimnal):
+                temp_productions.append(tuple((non_terimnal, prod)))
+        prod_sorted = sorted(temp_productions, key=lambda x: x[1].split()[0])
+        start_prod = [i for i in prod_sorted[1].split()[0].strip()]
+        start_prod = set(start_prod)
+        for unique in start_prod:
+                for i in range(0, len(prod_sorted)):
+                    temp_tuple = prod_sorted[i]
+                    temp_first = temp_tuple[1].split()[0]
+                    if temp_first == unique:
+                        continue
+                    else:
+                        break
+                same_unique = [prod_sorted[tt] for tt in range(0,i)]
+                #remove the unique from prod sorted
+                for t in same_unique:
+                    prod_sorted.remove(t)
+                new_non_terminal = get_new_nonterminal() #TODO:
+                #assign 
+                for i in same_unique:
+                    rhs_string = i[1]
+                    if unique != i[0]:
+                        raise RuntimeError
+                    rhs_string.sub(unique, new_non_terminal)
+                sep_productions[new_non_terminal] = unique
+                    
+
+    def llf(self):
+        temp_productions = list()
+        for prod in self.productions.items():
+            for rhs in prod[1]:
+                temp_productions.append((prod[[0], rhs]))
+        
+        unique = set(list(map(lambda x: (x[0], x[1].split()[0]), temp_productions)))
+        for u in unique:
+            same_unique = list(filter(lambda x: x[1].split()[0] == u, temp_productions))
+            if len(same_unique) == 1:
+                continue
+
+            new_non_terminal= self.get_new_nonterminal()
+            temp_productions.append((new_non_terminal, u))
+            for s in same_unique:
+                temp_productions.remove(s)
+                s[1].sub(u, new_non_terminal)
+                temp_productions.append(s)
+
+    def get_new_nonterminal(self):
+        import string
+        import random
+        yy = lambda _: string.ascii_letters[random.randint(0,len(string.ascii_letters))]
+        while True:
+             temp_str = ''.join(list(map(yy, range(3))))
+             if temp_str not in self.non_terminals:
+                 return temp_str
