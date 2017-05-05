@@ -2,7 +2,7 @@ import re
 
 import os
 CWD = os.getcwd()
-cfg_file_path = os.path.join(CWD,"src/cfg")
+cfg_file_path = os.path.join(CWD, "cfg")
 class Reader(object):
     def __init__(self, file_name=cfg_file_path):
         self.terminals = []
@@ -18,12 +18,12 @@ class Reader(object):
         # for k in self.non_terminals:
         #     print(k + " => " + self.productions[k])
         self.eliminateLeftRecusion()
-        for non_terminal in self.non_terminals:
-            array = self.productions[non_terminal].split("|")
-            temp = []
-            for element in array:
-                temp.append(element.strip())
-            self.productions2[non_terminal] = temp
+        # for non_terminal in self.non_terminals:
+        #     array = self.productions[non_terminal].split("|")
+        #     temp = []
+        #     for element in array:
+        #         temp.append(element.strip())
+        #     self.productions2[non_terminal] = temp
         # print(self.file_lines)
         # print(self.terminals)
         # print(self.non_terminals)
@@ -47,6 +47,7 @@ class Reader(object):
         for line in self.file_lines:
             temp = line.split('=')
             self.productions[temp[0].strip()] = temp[1].strip()
+            self.productions2[temp[0].strip()] = [i.strip() for i in temp[1].split('|')]
             self.non_terminals.append(temp[0].strip())
             terminals_list = re.findall(r'(\'[\w+*\-(),;{}=_]*\')', temp[1])
             for terminal in terminals_list:
@@ -69,12 +70,11 @@ class Reader(object):
                             else:
                                 s += 1
                         else:
-                            if self.productions[self.non_terminals[i]][s - 1] == ' ' and \
-                                            self.productions[self.non_terminals[i]][
-                                                        s + len(self.non_terminals[j])] == ' ':
+                            if self.productions[self.non_terminals[i]][s - 1] == ' ' and self.productions[self.non_terminals[i]][s + len(self.non_terminals[j])] == ' ':
                                 self.replaceString(self.non_terminals[i], self.non_terminals[j], s)
                             else:
                                 s += 1
+            self.lf(self.non_terminals[i])
             self.eliminateImmediateLeftRecusion(self.non_terminals[i])
 
     def replaceString(self, key, value, s):
@@ -93,29 +93,36 @@ class Reader(object):
             following += self.productions[key][end]
             end += 1
         if previous in ['| ', '|'] and following in [' |', '|']:
-            self.productions[key] = self.productions[key].replace(value.strip(), self.productions[value], 1)
+            new_data = self.productions[key].replace(value.strip(), self.productions[value], 1)
+            self.productions[key] = new_data
+            self.productions2[key] = [i.strip() for i in new_data.split('|')]
         elif previous in ['| ', '|']:
             new_string = ""
             splitted_productions = self.productions[value].split('|')
             for production in splitted_productions:
                 new_string += production.strip() + " " + following.strip() + " | "
             new_string = new_string[:len(new_string) - 3]
-            self.productions[key] = self.productions[key].replace((value + following).strip(), new_string, 1)
+            new_data = self.productions[key].replace((value + following).strip(), new_string, 1)
+            self.productions[key] = new_data
+            self.productions2[key] = [i.strip() for i in new_data.split('|')]
         elif following in [' |', '|']:
             new_string = ""
             splitted_productions = self.productions[value].split('|')
             for production in splitted_productions:
                 new_string += previous.strip() + " " + production.strip() + " | "
             new_string = new_string[:len(new_string) - 3]
-            self.productions[key] = self.productions[key].replace((previous + value).strip(), new_string, 1)
+            new_data = self.productions[key].replace((previous + value).strip(), new_string, 1)
+            self.productions[key] = new_data
+            self.productions2[key] = [i.strip() for i in new_data.split('|')]
         else:
             new_string = ""
             splitted_productions = self.productions[value].split('|')
             for production in splitted_productions:
                 new_string += previous.strip() + " " + production.strip() + " " + following.strip() + " | "
             new_string = new_string[:len(new_string) - 3]
-            self.productions[key] = self.productions[key].replace((previous + value + following).strip(), new_string,
-                                                                  1).replace("| |", "|")
+            new_data = self.productions[key].replace((previous + value + following).strip(), new_string, 1).replace("| |", "|")
+            self.productions[key] = new_data
+            self.productions2[key] = [i.strip() for i in new_data.split('|')]
         print(self.productions[key])
 
     def eliminateImmediateLeftRecusion(self, key):
@@ -138,12 +145,14 @@ class Reader(object):
                 string += non.strip() + " " + new_non_terminal + " | "
             string = string[:len(string) - 3]
             self.productions[key] = string
+            self.productions2[key] = [i.strip() for i in string.split('|')]
             new_non_terminal_value = ""
             for production in recursive:
                 new_non_terminal_value += production.replace(key, "").strip() + " " + new_non_terminal + " | "
             new_non_terminal_value += "None"
             self.non_terminals.append(new_non_terminal)
             self.productions[new_non_terminal] = new_non_terminal_value
+            self.productions2[new_non_terminal] = [i.strip() for i in new_non_terminal_value.split('|')]
 
     def getProduction(self, non_terminal, terminal):
         for production in self.productions2[non_terminal]:
@@ -178,7 +187,7 @@ class Reader(object):
                 #remove the unique from prod sorted
                 for t in same_unique:
                     prod_sorted.remove(t)
-                new_non_terminal = get_new_nonterminal() #TODO:
+                new_non_terminal = self.get_new_nonterminal() #TODO:
                 #assign 
                 for i in same_unique:
                     rhs_string = i[1]
@@ -191,21 +200,22 @@ class Reader(object):
     def lf(self, non_terminal):
         prods = []
         prods.append(self.productions2[non_terminal])
- #       yy = lambda rhs_array:
+
+        # yy = lambda rhs_array:
         def yy(rhs_array):
             dict1 = {}
             for i in range(0, len(rhs_array)):
-                #Construct dict1 with key as first word and value of index of OR PROD
+                # Construct dict1 with key as first word and value of index of OR PROD
                 first_char = rhs_array[i].split()[0]
                 if dict1.get(first_char) is None:
-                    #init 
+                    # init
                     dict1[first_char] = list()
                 dict1[first_char].append(i)
             for key in dict1:
-                if dict1.get(key).__len__() ==1:
+                if dict1.get(key).__len__() == 1:
                     continue
-                #found a factor
-                A = self.get_new_nonterminal()
+                # found a factor
+                A = self.nonTerminaleName(non_terminal)
                 rhs_new_prod =list() 
                 for p_index in dict1.get(key):
                     p = p_index
@@ -213,17 +223,17 @@ class Reader(object):
                     if non_factor == '':
                         non_factor = "None"
                     rhs_new_prod.append(non_factor)
-                    #changed ^ the production
+                    # changed ^ the production
                     # del(rhs_array[0])
-                    #instead of del that change index add a none object
-                    rhs_array[p]=None
-                #finished factoring for current factor key
-                #add the new production in the productions table
-                #first remove dublicates 
+                    # instead of del that change index add a none object
+                    rhs_array[p] = None
+                # finished factoring for current factor key
+                # add the new production in the productions table
+                # first remove dublicates
                 prods.append(list(set(rhs_new_prod)))
-                #FIXME: do we need to reference RHS?
-                #NO WE DONT!!
-#                self.prods[non_terminal_input]
+                # FIXME: do we need to reference RHS?
+                # NO WE DONT!!
+                # self.prods[non_terminal_input]
                 self.productions2[A] = rhs_new_prod
                 rhs_array.append(key+' '+A)
                 try:
@@ -238,7 +248,7 @@ class Reader(object):
     def get_new_nonterminal(self):
         import string
         import random
-        yy = lambda _: string.ascii_letters[random.randint(0,len(string.ascii_letters))]
+        yy = lambda _: string.ascii_letters[random.randint(0, len(string.ascii_letters))]
         while True:
              temp_str = ''.join(list(map(yy, range(3))))
              if temp_str not in self.non_terminals:
