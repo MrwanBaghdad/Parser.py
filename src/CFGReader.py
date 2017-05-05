@@ -236,11 +236,11 @@ class Reader(object):
                 # self.prods[non_terminal_input]
                 self.productions2[A] = rhs_new_prod
                 rhs_array.append(key+' '+A)
-                try:
-                    while True:
-                        rhs_array.remove(None)
-                except ValueError as err:
-                    pass
+            try:
+                while True:
+                    rhs_array.remove(None)
+            except ValueError as err:
+                pass
         for rhs in prods:
             yy(rhs)
             
