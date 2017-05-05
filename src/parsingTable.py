@@ -1,6 +1,7 @@
 class Table(object):
     def __init__(self, cfg, firsts, follows):
         self.cfg = cfg
+        self.temp_input = ['$',  '}', ';', '0', 'assign', 'id', '{', ')', 'num', 'relop', 'id', '(', 'if', ';', 'num', 'assign', 'id', ';', 'id', 'int']
         self.table = dict()
         for non_terminal in cfg.non_terminals:
             for terminal in cfg.terminals:
@@ -14,12 +15,11 @@ class Table(object):
         print(self.table)
 
     def trace(self):
-        # TODO Implement the trace function
         stack = ['$', self.cfg.non_terminals[0]]
         terminal = self.nextInput()
         stack_peek = stack[-1]
         while stack_peek != '$':
-            if terminal is '$':
+            if terminal == '$':
                 print(stack_peek + " => " + data)
                 stack.pop()
             elif stack_peek in self.cfg.non_terminals:
@@ -45,7 +45,8 @@ class Table(object):
             stack_peek = stack[-1]
 
     def nextInput(self):
-        temp = lexical_analyzer.next()
-        if temp is None:
-            return '$';
-        return temp
+        # temp = lexical_analyzer.next()
+        # if temp is None:
+        #     return '$';
+        # return temp
+        return self.temp_input.pop()
