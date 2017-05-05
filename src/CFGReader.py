@@ -29,7 +29,7 @@ class Reader(object):
         # print(self.non_terminals)
         print(self.productions)
         for k in self.non_terminals:
-            print(k + " => " + self.productions[k])
+            print(k + " => " + ''.join(self.productions2[k]))
 
     def prepareData(self):
         # Read Productions From the given file and analyze data into terminals and non-terminals
@@ -139,7 +139,7 @@ class Reader(object):
             else:
                 non_recursive.append(production)
         if len(recursive) > 0:
-            new_non_terminal = key + "`"
+            new_non_terminal = self.nonTerminaleName(key)
             string = ""
             for non in non_recursive:
                 string += non.strip() + " " + new_non_terminal + " | "
@@ -164,6 +164,7 @@ class Reader(object):
         new_name = non_terminal + "`"
         while new_name in self.non_terminals:
             new_name += "`"
+        self.non_terminals.append(new_name)
         return new_name
 
     def leftFactoring(self):
