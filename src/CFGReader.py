@@ -2,7 +2,7 @@ import re
 
 import os
 CWD = os.getcwd()
-cfg_file_path = os.path.join(CWD, "cfg")
+cfg_file_path = os.path.join(CWD, "src/cfg")
 class Reader(object):
     def __init__(self, file_name=cfg_file_path):
         self.terminals = []
@@ -219,7 +219,7 @@ class Reader(object):
                 rhs_new_prod =list() 
                 for p_index in dict1.get(key):
                     p = p_index
-                    non_factor = ''.join(rhs_array[p][1:])
+                    non_factor = ''.join(rhs_array[p].split()[1:])
                     if non_factor == '':
                         non_factor = "None"
                     rhs_new_prod.append(non_factor)
