@@ -1,8 +1,10 @@
 import re
 
-
+import os
+CWD = os.getcwd()
+cfg_file_path = os.path.join(CWD,"src/cfg")
 class Reader(object):
-    def __init__(self, file_name='cfg'):
+    def __init__(self, file_name=cfg_file_path):
         self.terminals = []
         self.non_terminals = []
         self.file_lines = []
@@ -188,7 +190,7 @@ class Reader(object):
 
     def lf(self, non_terminal):
         prods = []
-        prods.append(self.productions[non_terminal])
+        prods.append(self.productions2[non_terminal])
  #       yy = lambda rhs_array:
         def yy(rhs_array):
             dict1 = {}
@@ -212,7 +214,9 @@ class Reader(object):
                         non_factor = "None"
                     rhs_new_prod.append(non_factor)
                     #changed ^ the production
-                    del(rhs_array[p])
+                    # del(rhs_array[0])
+                    #instead of del that change index add a none object
+                    rhs_array[p]=None
                 #finished factoring for current factor key
                 #add the new production in the productions table
                 #first remove dublicates 
@@ -220,10 +224,16 @@ class Reader(object):
                 #FIXME: do we need to reference RHS?
                 #NO WE DONT!!
 #                self.prods[non_terminal_input]
-                self.productions[A] = rhs_new_prod
+                self.productions2[A] = rhs_new_prod
                 rhs_array.append(key+' '+A)
+                try:
+                    while True:
+                        rhs_array.remove(None)
+                except ValueError as err:
+                    pass
         for rhs in prods:
             yy(rhs)
+            
 
     def get_new_nonterminal(self):
         import string
@@ -233,3 +243,9 @@ class Reader(object):
              temp_str = ''.join(list(map(yy, range(3))))
              if temp_str not in self.non_terminals:
                  return temp_str
+
+if __name__ == "__main__":
+    r1 = Reader()
+    r1.lf('S')
+    from pprint import pprint
+    pprint(r1.productions2)

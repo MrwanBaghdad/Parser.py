@@ -1,3 +1,5 @@
+import logging
+logging.basicConfig(level=logging.DEBUG)
 class Table(object):
     def __init__(self, cfg, firsts, follows):
         self.cfg = cfg
@@ -6,13 +8,14 @@ class Table(object):
         for non_terminal in cfg.non_terminals:
             for terminal in cfg.terminals:
                 if terminal in firsts.get(non_terminal):
-                    self.table[(non_terminal, terminal)] = cfg.getProduction(non_terminal, terminal)
+                    self.table[(non_terminal, terminal)] = cfg.productions.get(non_terminal)
                 elif terminal in follows[non_terminal]:
                     self.table[(non_terminal, terminal)] = "sync"
                 else:
                     self.table[(non_terminal, terminal)] = None
         # self.table[(cfg.non_terminals[0], '$')] = 'sync'
-        print(self.table)
+        from tabulate import tabulate
+        print((self.table))
 
     def trace(self):
         stack = ['$', self.cfg.non_terminals[0]]
@@ -50,3 +53,8 @@ class Table(object):
         #     return '$';
         # return temp
         return self.temp_input.pop()
+
+if __name__ == "__main__":
+    import construct_first_follows as ff 
+    ff.reader.terminals = [terminal.replace("'", "") for terminal in ff.reader.terminals]
+    Table(ff.reader, ff.firsts, ff.follows)
