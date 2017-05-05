@@ -186,24 +186,44 @@ class Reader(object):
                 sep_productions[new_non_terminal] = unique
                     
 
-    def llf(self):
-        temp_productions = list()
-        for prod in self.productions.items():
-            for rhs in prod[1]:
-                temp_productions.append((prod[[0], rhs]))
-        
-        unique = set(list(map(lambda x: (x[0], x[1].split()[0]), temp_productions)))
-        for u in unique:
-            same_unique = list(filter(lambda x: x[1].split()[0] == u, temp_productions))
-            if len(same_unique) == 1:
-                continue
-
-            new_non_terminal= self.get_new_nonterminal()
-            temp_productions.append((new_non_terminal, u))
-            for s in same_unique:
-                temp_productions.remove(s)
-                s[1].sub(u, new_non_terminal)
-                temp_productions.append(s)
+    def lf(self, non_terminal):
+        prods = []
+        prods.append(self.productions[non_terminal])
+ #       yy = lambda rhs_array:
+        def yy(rhs_array):
+            dict1 = {}
+            for i in range(0, len(rhs_array)):
+                #Construct dict1 with key as first word and value of index of OR PROD
+                first_char = rhs_array[i].split()[0]
+                if dict1.get(first_char) is None:
+                    #init 
+                    dict1[first_char] = list()
+                dict1[first_char].append(i)
+            for key in dict1:
+                if dict1.get(key).__len__() ==1:
+                    continue
+                #found a factor
+                A = self.get_new_nonterminal()
+                rhs_new_prod =list() 
+                for p_index in dict1.get(key):
+                    p = p_index
+                    non_factor = ''.join(rhs_array[p][1:])
+                    if non_factor == '':
+                        non_factor = "None"
+                    rhs_new_prod.append(non_factor)
+                    #changed ^ the production
+                    del(rhs_array[p])
+                #finished factoring for current factor key
+                #add the new production in the productions table
+                #first remove dublicates 
+                prods.append(list(set(rhs_new_prod)))
+                #FIXME: do we need to reference RHS?
+                #NO WE DONT!!
+#                self.prods[non_terminal_input]
+                self.productions[A] = rhs_new_prod
+                rhs_array.append(key+' '+A)
+        for rhs in prods:
+            yy(rhs)
 
     def get_new_nonterminal(self):
         import string
