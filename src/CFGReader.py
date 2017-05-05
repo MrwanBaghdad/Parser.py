@@ -231,11 +231,13 @@ class Reader(object):
                 # finished factoring for current factor key
                 # add the new production in the productions table
                 # first remove dublicates
-                prods.append(list(set(rhs_new_prod)))
+                
                 # FIXME: do we need to reference RHS?
                 # NO WE DONT!!
                 # self.prods[non_terminal_input]
-                self.productions2[A] = rhs_new_prod
+                # prods.append(list(set(rhs_new_prod)))
+                self.productions2[A] = list(set(rhs_new_prod))
+                prods.append(self.productions2[A])
                 rhs_array.append(key+' '+A)
             try:
                 while True:
