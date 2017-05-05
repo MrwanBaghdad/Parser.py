@@ -219,7 +219,7 @@ class Reader(object):
                 rhs_new_prod =list() 
                 for p_index in dict1.get(key):
                     p = p_index
-                    non_factor = ''.join(rhs_array[p].split()[1:])
+                    non_factor = ' '.join(rhs_array[p].split()[1:])
                     if non_factor == '':
                         non_factor = "None"
                     rhs_new_prod.append(non_factor)
@@ -256,6 +256,5 @@ class Reader(object):
 
 if __name__ == "__main__":
     r1 = Reader()
-    r1.lf('S')
     from pprint import pprint
     pprint(r1.productions2)
