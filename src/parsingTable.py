@@ -20,9 +20,12 @@ class Table(object):
         # TODO Implement the trace function
         stack = ['$', self.cfg.non_terminals[0]]
         terminal = self.nextInput()
-        while stack_peek is not None:
-            stack_peek = stack[-1]
-            if stack_peek in self.cfg.non_terminals:
+        stack_peek = stack[-1]
+        while stack_peek != '$':
+            if terminal is '$':
+                print(stack_peek + " => " + data)
+                stack.pop()
+            elif stack_peek in self.cfg.non_terminals:
                 data = self.table.get((stack_peek, terminal))
                 if data is None:
                     print("Error: (illegal " + stack_peek + ")")
@@ -42,6 +45,7 @@ class Table(object):
                 terminal = self.nextInput()
             else:
                 print("Unknown Symbol => " + stack_peek)
+            stack_peek = stack[-1]
 
     def nextInput(self):
         temp = lexical_analyzer.next()
