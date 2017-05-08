@@ -136,12 +136,13 @@ def get_follows(variable):
                     follows[variable].extend(temp_list)
                     if v == testing_string.split()[-1] and v != product['LHS']:
                         '''at end of rule'''
+                        get_follows(product['LHS'])
                         follows[variable].extend(get_follows(product['LHS']))
                 else:
-                    break
+                    return follows.get(variable)
 
 def translate():
-    for non_terminal in reader.non_terminals:
+    for non_terminal in sorted(((reader.non_terminals))):
         temp_dict = dict()
         temp_dict['LHS'] = non_terminal
         temp_dict['RHS'] = [i.strip() for i in reader.productions.get(non_terminal).split('|')]
@@ -173,6 +174,7 @@ print(pprint(follows))
 #cleaning firsts
 logging.debug("start cleaning")
 temp_follow  = dict()
+
 for i in firsts.keys():
     arr = firsts.get(i)
     pprint(arr)
@@ -182,7 +184,11 @@ for i in firsts.keys():
             #expand and remove
             if isinstance(arr, list) is False:
                 raise TypeError
+
             arr.remove(j)
+            while isinstance(j[0], list):
+                j=j[0]
+            print(j)
             arr.extend(j)
 logging.debug("finished cleaning")
 
