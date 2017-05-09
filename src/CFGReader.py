@@ -2,7 +2,7 @@ import re
 
 import os
 CWD = os.getcwd()
-cfg_file_path = os.path.join(CWD, "src/cfg")
+cfg_file_path = os.path.join(CWD, "cfg")
 class Reader(object):
     def __init__(self, file_name=cfg_file_path):
         self.terminals = []
@@ -51,7 +51,8 @@ class Reader(object):
             self.non_terminals.append(temp[0].strip())
             terminals_list = re.findall(r'(\'[\w+*\-(),;{}=_]*\')', temp[1])
             for terminal in terminals_list:
-                self.terminals.append(terminal)
+                if terminal not in self.terminals:
+                    self.terminals.append(terminal)
 
     def eliminateLeftRecusion(self):
         # Eleminate left recursions from the productions

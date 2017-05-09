@@ -27,7 +27,7 @@ class Table(object):
                             if first == terminal or terminal in firsts.get(first):
                                 self.table[(non_terminal, terminal)] = production
                                 break
-                        elif "'"+first+"'" in cfg.terminals:
+                        elif first in cfg.terminals:
                             if first == terminal:
                                 self.table[(non_terminal, terminal)] = production
                                 break
@@ -64,7 +64,7 @@ class Table(object):
                         if element.strip() != "None":
                             stack.append(element.strip())
                     print(stack_peek+" => "+data)
-            elif "'"+stack_peek+"'" in self.cfg.terminals:
+            elif stack_peek in self.cfg.terminals:
                 if stack_peek != terminal:  # Done Matching
                     print("Error: missing " + stack_peek)
                 else:
