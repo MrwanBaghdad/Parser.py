@@ -197,9 +197,9 @@ for i in firsts.keys():
             print(j)
             arr.extend(j)
 logging.debug("finished cleaning")
-
+print("Firsts")
 pprint(firsts)
-
+print("follows")
 
 logging.debug("FOLOOOOWS")
 pprint(follows)
