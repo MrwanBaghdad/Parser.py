@@ -17,7 +17,7 @@ class Reader(object):
         # print(self.productions)
         # for k in self.non_terminals:
         #     print(k + " => " + self.productions[k])
-        self.eliminateLeftRecusion()
+        # self.eliminateLeftRecusion()
         # for non_terminal in self.non_terminals:
         #     array = self.productions[non_terminal].split("|")
         #     temp = []

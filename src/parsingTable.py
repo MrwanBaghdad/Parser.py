@@ -3,9 +3,9 @@ logging.basicConfig(level=logging.DEBUG)
 class Table(object):
     def __init__(self, cfg, firsts, follows):
         self.cfg = cfg
-        self.temp_input = ['h', '+', 'h']
+        # self.temp_input = ['h', '+', 'h']
         # self.temp_input = ['b', 'a', 'a']
-        # self.temp_input = ['}', ';', '0', 'assign', 'id', '{', ')', 'num', 'relop', 'id', '(', 'if', ';', 'num', 'assign', 'id', ';', 'id', 'int']
+        self.temp_input = ['}', ';', '0', 'assign', 'id', '{', ')', 'num', 'relop', 'id', '(', 'if', ';', 'num', 'assign', 'id', ';', 'id', 'int']
         self.table = dict()
         for non_terminal in cfg.non_terminals:
             if '$' in follows[non_terminal]:
