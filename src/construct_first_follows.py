@@ -31,7 +31,8 @@ def construct_first(production_rules):
                 temp_variable = or_rules.split()[0].strip()
                 if firsts.get(temp_variable) is None or len(firsts.get(temp_variable)) == 0:
                     get_firsts(temp_variable)
-                firsts[rule['LHS']].append(firsts[or_rules.split()[0].strip()])
+                firsts[rule['LHS']].extend(firsts[or_rules.split()[0].strip()])
+                firsts[rule['LHS']] = list(set(firsts[rule['LHS']]))
 
 def get_firsts(variable):
     product = reader.productions.get(variable)
@@ -44,7 +45,7 @@ def get_firsts(variable):
             get_firsts(or_rules.split()[0].strip())
             if firsts.get(variable) is None:
                 firsts[variable] = list()
-            firsts[variable].append(or_rules.strip().split()[0])
+            firsts[variable].extend(firsts.get(or_rules.strip().split()[0]))
 
 follows = dict()
 def construct_follows(production_rules):
@@ -162,12 +163,12 @@ from pprint import pprint
 
 translate()
 
-# from tabulate import tabulate
+from tabulate import tabulate
 
-# print(tabulate(production_rules))
+print(tabulate(production_rules))
 construct_first(production_rules)
-# print("sssssssssssssss")
-# pprint(firsts)
+print("sssssssssssssss")
+pprint(firsts)
 
 construct_follows(production_rules)
 def remove_follows_dub():
@@ -198,3 +199,7 @@ for i in firsts.keys():
 logging.debug("finished cleaning")
 
 pprint(firsts)
+
+
+logging.debug("FOLOOOOWS")
+pprint(follows)
