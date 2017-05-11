@@ -148,7 +148,7 @@ def get_follows(variable):
                     return follows.get(variable)
 
 def translate():
-    for non_terminal in sorted(((reader.non_terminals))):
+    for non_terminal in (((reader.non_terminals))):
         temp_dict = dict()
         temp_dict['LHS'] = non_terminal
         temp_dict['RHS'] = [i.strip() for i in reader.productions.get(non_terminal).split('|')]
