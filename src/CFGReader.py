@@ -2,7 +2,7 @@ import re
 
 import os
 CWD = os.getcwd()
-cfg_file_path = os.path.join(CWD, "cfg")
+cfg_file_path = os.path.join(CWD, "src/cfg")
 class Reader(object):
     def __init__(self, file_name=cfg_file_path):
         self.terminals = []
