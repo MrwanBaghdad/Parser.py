@@ -19,7 +19,7 @@ def construct_first(production_rules):
         for or_rules in rule['RHS']:
             if or_rules[0] == '\'':
                 '''getting a terminal'''
-                firsts[rule['LHS']].append(or_rules[1])
+                firsts[rule['LHS']].append(or_rules.strip().split()[0])
             else:
                 '''getting a non terminal'''
                 elipson_index = or_rules.find("None")
@@ -36,10 +36,15 @@ def construct_first(production_rules):
 def get_firsts(variable):
     product = reader.productions.get(variable)
     for or_rules in product.split("|"):
-        if or_rules[0]== '\'':
+        if or_rules.strip()[0]== '\'':
             if firsts.get(variable) is None:
                 firsts[variable] = list()
-            firsts[variable].append(or_rules[1])
+            firsts[variable].append(or_rules.strip().split()[0])
+        else:
+            get_firsts(or_rules.split()[0].strip())
+            if firsts.get(variable) is None:
+                firsts[variable] = list()
+            firsts[variable].append(or_rules.strip().split()[0])
 
 follows = dict()
 def construct_follows(production_rules):
