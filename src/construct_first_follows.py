@@ -157,12 +157,12 @@ from pprint import pprint
 
 translate()
 
-from tabulate import tabulate
+# from tabulate import tabulate
 
-print(tabulate(production_rules))
+# print(tabulate(production_rules))
 construct_first(production_rules)
-print("sssssssssssssss")
-pprint(firsts)
+# print("sssssssssssssss")
+# pprint(firsts)
 
 construct_follows(production_rules)
 def remove_follows_dub():

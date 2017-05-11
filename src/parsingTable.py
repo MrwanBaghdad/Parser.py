@@ -73,6 +73,7 @@ class Table(object):
 
             else:
                 print("Unknown Symbol => " + terminal)
+                terminal = self.nextInput()
             stack_peek = stack[-1]
         print("accept")
 
