@@ -3,6 +3,7 @@ logging.basicConfig(level=logging.DEBUG)
 class Table(object):
     def __init__(self, cfg, firsts, follows):
         self.cfg = cfg
+        cfg.terminals = [terminal.replace("'", "") for terminal in cfg.terminals]
         seen = set()
         seen_add = seen.add
         cfg.terminals = [x for x in cfg.terminals if not (x in seen or seen_add(x))]
@@ -11,7 +12,7 @@ class Table(object):
         cfg.non_terminals = [x for x in cfg.non_terminals if not (x in seen or seen_add(x))]
         # self.temp_input = ['h', '+', 'h']
         # self.temp_input = ['b', 'a', 'a']
-        self.temp_input = ['}', ';', '0', 'assign', 'id', '{', ')', 'num', 'relop', 'id', '(', 'if', ';', 'num', 'assign', 'id', ';', 'id', 'int']
+        self.temp_input = ['}', ';', 'num', 'assign', 'id', '{', ')', 'num', 'relop', 'id', '(', 'if', ';', 'num', 'assign', 'id', ';', 'id', 'int']
         self.table = dict()
         for non_terminal in cfg.non_terminals:
             if '$' in follows[non_terminal] and 'None' in firsts[non_terminal]:
@@ -56,13 +57,13 @@ class Table(object):
         while stack_peek != '$':
             if terminal == '$':
                 if self.table.get((stack_peek, terminal)) is not None:
-                    string = self.replaceString(string, stack_peek, self.table.get((stack_peek, terminal)))
+                    string = self.replaceString(string, stack_peek, self.table.get((stack_peek, terminal))).replace("None", "")
                     print(string + " || " + stack_peek + " => " + self.table.get((stack_peek, terminal)))
                 stack.pop()
             elif stack_peek in self.cfg.non_terminals:
                 data = self.table.get((stack_peek, terminal))
                 if data is None:
-                    string = self.replaceString(string, stack_peek, '')
+                    string = self.replaceString(string, stack_peek, '').replace("None", "")
                     print(string + " || " + "Error: (illegal " + stack_peek + ")")
                     terminal = self.nextInput()
                 elif data == 'sync':  # Done popping from the stack.
@@ -73,7 +74,7 @@ class Table(object):
                     for element in reversed(data.split()):  # Done Pushing elements to stack and output the production
                         if element.strip() != "None":
                             stack.append(element.strip())
-                    string = self.replaceString(string, stack_peek, data)
+                    string = self.replaceString(string, stack_peek, data).replace("None", "")
                     print(string + " || " + stack_peek + " => " + data)
             elif stack_peek in self.cfg.terminals:
                 if stack_peek != terminal:  # Done Matching
@@ -104,10 +105,10 @@ class Table(object):
         s = string.find(to_be_replaced, 0)
         if s > 0:
             if s + len(to_be_replaced) == len(string):
-                return string.replace(" " + to_be_replaced, " " + replacement)
+                return string.replace(" " + to_be_replaced, " " + replacement, 1)
             else:
-                return string.replace(" " + to_be_replaced + " ", " " + replacement + " ")
-        return string.replace(to_be_replaced + " ", replacement + " ")
+                return string.replace(" " + to_be_replaced + " ", " " + replacement + " ", 1)
+        return string.replace(to_be_replaced + " ", replacement + " ", 1)
 
 if __name__ == "__main__":
     import construct_first_follows as ff 
