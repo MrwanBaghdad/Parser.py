@@ -45,7 +45,7 @@ class Reader(object):
                 j += 1
                 self.file_lines.append(temp[i])
         for line in self.file_lines:
-            temp = line.split('=')
+            temp = line.split('=',maxsplit=1)
             self.productions[temp[0].strip()] = temp[1].strip()
             self.productions2[temp[0].strip()] = [i.strip() for i in temp[1].split('|')]
             self.non_terminals.append(temp[0].strip())

@@ -134,7 +134,7 @@ def get_follows(variable):
             for v in testing_string.split():
                 v = v.strip()
                 if v[0] == '\'':
-                    follows[variable].append(v[1])
+                    follows[variable].append(v.split()[0].strip("'").strip())
                     break
                 if ELIPSON in firsts.get(v):
                     temp_list = firsts.get(v).copy()
@@ -145,7 +145,8 @@ def get_follows(variable):
                         get_follows(product['LHS'])
                         follows[variable].extend(get_follows(product['LHS']))
                 else:
-                    return follows.get(variable)
+                    follows[variable].extend(firsts[v])
+                return follows.get(variable)
 
 def translate():
     for non_terminal in (((reader.non_terminals))):
