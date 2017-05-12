@@ -146,7 +146,8 @@ def get_follows(variable):
                         follows[variable].extend(get_follows(product['LHS']))
                 else:
                     follows[variable].extend(firsts[v])
-                return follows.get(variable)
+                    break
+    return follows.get(variable)
 
 def translate():
     for non_terminal in (((reader.non_terminals))):
