@@ -2,7 +2,7 @@
 firsts = dict()
 
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 from CFGReader import Reader
 
@@ -161,23 +161,22 @@ def translate():
     ALL_RHS_RULES = [rule['RHS'] for rule in production_rules]
     ELIPSON = "None"
 
-from pprint import pprint
+# from pprint import pprint
 
 translate()
 
 from tabulate import tabulate
 
-print(tabulate(production_rules))
 construct_first(production_rules)
-print("sssssssssssssss")
-pprint(firsts)
+# print("sssssssssssssss")
+# pprint(firsts)
 
 construct_follows(production_rules)
 def remove_follows_dub():
     for variable in VARIABLES:
         follows[variable] = list(set(follows.get(variable))) 
 remove_follows_dub()
-print(pprint(follows))
+# print(pprint(follows))
 
 #cleaning firsts
 logging.debug("start cleaning")
@@ -185,7 +184,7 @@ temp_follow  = dict()
 
 for i in firsts.keys():
     arr = firsts.get(i)
-    pprint(arr)
+    # pprint(arr)
     for j in arr:
         # logging.debug("Found arr "+str(arr))
         if isinstance(j, list):
@@ -200,8 +199,12 @@ for i in firsts.keys():
             arr.extend(j)
 logging.debug("finished cleaning")
 print("Firsts")
-pprint(firsts)
+# pprint(firsts)
 print("follows")
 
 logging.debug("FOLOOOOWS")
-pprint(follows)
+# pprint(follows)
+final = list(map(lambda nt:  tuple((nt, firsts[nt],follows[nt])), VARIABLES))
+final = [("Non terminal", "firsts", "follows")]+(final)
+print(tabulate(final))
+# print(tabulate(production_rules))
